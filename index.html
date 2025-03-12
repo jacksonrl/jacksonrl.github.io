@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>CrowPanel ESP32 E-paper Display Review</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">CrowPanel ESP32 E-paper Display Review</h1>
+</header>
+<style>
+body {
+  font-family: Arial, sans-serif;
+}
+</style>
+<figure>
+<img src="clock final.jpg" alt="the clock in its final form">
+</figure>
+<h2 id="background">Background</h2>
+<p>I recently purchased the descriptively named “CrowPanel ESP32 2.13
+E-paper HMI Display with 122*250 Resolution, Black/White Color Driven By
+SPI Interface” by Elecrow. I’ve been meaning to get one of these for a
+while to serve as a bedroom clock. Digital clocks either produce too
+much light or are too dim and have bad viewing angles (such as
+reflective LCDs). Analog clocks, on the other hand, make too much noise.
+Until now, I’ve just been using my phone to check the time, which does
+an adequate job in most situations. E-ink displays, also called e-paper
+displays, don’t produce any light and have great viewing angles. The
+catch is that when it’s really dark you can’t see the time at all, as it
+doesn’t emit any light. The best explanation I’ve heard for what an
+e-ink display is is an automatic Etch A Sketch. You use a magnetic
+charge to set the value of each pixel. There’s also a great video
+showing how the pixels change close up here: <a
+href="https://www.youtube.com/watch?v=1qIHCUWAgh4"
+class="uri">https://www.youtube.com/watch?v=1qIHCUWAgh4</a>.</p>
+<p>Why not simply buy an e-paper clock then? There actually is an e-ink
+clock already on the market: the Xiaomi Mijia Clock, available on
+AliExpress.</p>
+<figure>
+<img src="xiaomi mija.jpg" alt="Xiaomi Mijia">
+<figcaption>
+Xiaomi Mija Temperature and Humidity Monitor Clock.
+</figcaption>
+</figure>
+<p>However, according to reviews, it only displays the time in China
+(UTC+8). This left me with no choice but to build the clock myself.</p>
+<h2 id="the-display">The Display</h2>
+<p>In terms of displays, there are several options, with the most
+popular being Waveshare. Elecrow’s offerings have a key advantage,
+however, in that they come with an ESP32 microcontroller built in. The
+microcontroller is what actually keeps track of time and tells the
+display what pixels to turn on.</p>
+<p>I find this to be very pleasing as it means I don’t need to buy the
+display, a microcontroller, and the display HAT (Hardware Attached on
+Top) which connects the microcontroller to the display. Additionally,
+since all these products ship from China, it reduces the overall
+expected waiting time to buy it all in one package.</p>
+<p>Also included is a USB-C port and USB A to C cable to connect the
+device to a computer. The device needs to be plugged in at all times as
+no battery is included.</p>
+<figure>
+<img src="display back.jpg" alt="The back of the display">
+</figure>
+<p>In my opinion, bundling a microcontroller with the display is a great
+idea and should be more common. If I had to guess, more than 90% of
+people buying a small e-paper display are going to use an ESP32 to drive
+it, and the ESP32s themselves are only about $3 each when purchased in
+bulk. The particular ESP32 used in the CrowPanel is the ESP32-S3. This
+uses the Xtensa ISA as opposed to the ESP32-C3, which uses the RISC-V
+ISA.</p>
+<figure>
+<img src="esp32 closeup.jpg" alt="ESP32 closeup">
+<figcaption>
+Closeup of the ESP32.
+</figcaption>
+</figure>
+<h2 id="developing-for-the-crowpanel">Developing for the CrowPanel</h2>
+<p>Developing for the CrowPanel is actually a very smooth experience,
+and I only ran into two issues during the entire project. Elecrow has a
+six-video tutorial series on the display here - <a
+href="https://www.youtube.com/playlist?list=PLwh4PlcPx2GdI_AT3WXtLRXiAxgFTiaJ-"
+class="uri">https://www.youtube.com/playlist?list=PLwh4PlcPx2GdI_AT3WXtLRXiAxgFTiaJ-</a>
+and has ample example code to start from. To summarize the intro video,
+you need to install the Arduino IDE, install the ESP-32 package, set
+your dev board to “ESPS32 Dev Module,” set the partition scheme to “Huge
+app (3MB),” set PSRAM to “OPI” and set the serial port to the port of
+your device. Then all you need to do is download their example projects
+<a href="https://github.com/Elecrow-RD/ESP32_S3-Ink-Screen"
+class="uri">https://github.com/Elecrow-RD/ESP32_S3-Ink-Screen</a> and
+run them.</p>
+<p>The first issue I ran into was that my laptop did not recognize the
+device. I tried every port and multiple cables, but device manager could
+not find a driver for the device. Luckily, the problem did not occur on
+my desktop PC, so I was able to use that. From some Googling, the issue
+might be that the device only supports USB 2.0, although I’m not
+sure.</p>
+<p>Once the display is recognized, you can use the “refresh_time”
+example project to set up the clock. It also comes with weather and
+humidity display support via OpenWeatherMap, which I didn’t need.</p>
+<figure>
+<img src="clock with weather.jpg" alt="clock with weather data from OpenWeatherMap">
+<figcaption>
+I don’t a clock to tell me what year it is…
+</figcaption>
+</figure>
+<p>The time is set by connecting to an NTP server. This is where the
+ESP32’s WiFi module comes into play. Of course, you need to give the
+device your SSID and password. The CrowPanel does come with a rotary
+switch which you could theoretically use to set the time manually. If
+you use the sample code, beware of a slight issue with the time update
+logic. Here’s how that looks:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">unsigned</span> <span class="dt">long</span> lastUpdateTime <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> loop<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">unsigned</span> <span class="dt">long</span> currentTime <span class="op">=</span> millis<span class="op">();</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>currentTime <span class="op">-</span> lastUpdateTime <span class="op">&gt;=</span> <span class="dv">60000</span><span class="op">)</span> <span class="op">{</span> <span class="co">// Execute every minute</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    update_Display<span class="op">();</span>   <span class="co">// update time</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    lastUpdateTime <span class="op">=</span> currentTime<span class="op">;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>The issue here is that <code>millis()</code> is using the device’s
+internal clock, which is the number of milliseconds since the device
+booted. This is separate from the actual time of day. Since the display
+updates the current time every 60 seconds, that means that the clock
+could be 0-59 seconds out of sync with the actual time, depending on how
+many seconds into the minute the device booted. Instead, you want to
+check the actual time of day against the last minute like so:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> last_min <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> loop<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">time_t</span> t<span class="op">;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  time<span class="op">(&amp;</span>t<span class="op">);</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">struct</span> tm <span class="op">*</span>timeinfo <span class="op">=</span> localtime<span class="op">(&amp;</span>t<span class="op">);</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> current_min <span class="op">=</span> timeinfo<span class="op">-&gt;</span>tm_min<span class="op">;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span><span class="op">(</span>current_min <span class="op">!=</span> last_min<span class="op">){</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    update_Display<span class="op">();</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    last_min <span class="op">=</span> current_min<span class="op">;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h2 id="fonts">Fonts</h2>
+<p>Now comes the real issue. Here’s the logic for displaying the
+time:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">static</span> <span class="dt">char</span> buff<span class="op">[</span><span class="dv">20</span><span class="op">];</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>sprintf<span class="op">(</span>buff<span class="op">,</span> <span class="st">&quot;</span><span class="sc">%02d</span><span class="st">:</span><span class="sc">%02d</span><span class="st">&quot;</span><span class="op">,</span> timeinfo<span class="op">-&gt;</span>tm_hour<span class="op">,</span> timeinfo<span class="op">-&gt;</span>tm_min<span class="op">);</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>EPD_ShowString<span class="op">(</span><span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> buff<span class="op">,</span> BLACK<span class="op">,</span> <span class="dv">48</span><span class="op">);</span></span></code></pre></div>
+<p>This displays the current time from the top left of the screen in
+black with a size 48pt font. Simple enough. As I mentioned earlier, the
+example project also displays the temperature and humidity, as well as
+two images, the date, and the day. I didn’t need any of those extra
+features, so I had a lot more room left on the display.</p>
+<figure>
+<img src="clock small font.jpg" alt="clock with the largest native font, 48pt">
+</figure>
+<p>The size of the display is 122x250, so I should be able to at least
+double the font size of the time. Naturally, one would try the following
+change:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>EPD_ShowString<span class="op">(</span><span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> buff<span class="op">,</span> BLACK<span class="op">,</span> <span class="dv">100</span><span class="op">);</span></span></code></pre></div>
+<p>This makes a lot of sense and is what you would expect if you were
+working on a website or mobile app, but it doesn’t work in embedded
+development. The graphics libraries are much less feature-rich here, and
+for good reason. While the ESP32 is pretty powerful for a
+microcontroller, it’s still a microcontroller, and performance is key
+here. The EPD.cpp graphics library is only 458 lines, including
+comments. Let’s look at what <code>EPD_ShowString</code> is actually
+doing:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> EPD_ShowString<span class="op">(</span><span class="dt">uint16_t</span> x<span class="op">,</span> <span class="dt">uint16_t</span> y<span class="op">,</span> <span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span>s<span class="op">,</span> <span class="dt">uint8_t</span> color<span class="op">,</span> <span class="dt">uint16_t</span> sizey<span class="op">)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">((*</span>s <span class="op">&lt;=</span> <span class="ch">&#39;~&#39;</span><span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="op">(*</span>s <span class="op">&gt;=</span> <span class="ch">&#39; &#39;</span><span class="op">))</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>x <span class="op">&gt;</span> <span class="op">(</span>EPD_W <span class="op">-</span> <span class="dv">1</span><span class="op">)</span> <span class="op">||</span> y <span class="op">&gt;</span> <span class="op">(</span>EPD_H <span class="op">-</span> <span class="dv">1</span><span class="op">))</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        EPD_ShowChar<span class="op">(</span>x<span class="op">,</span> y<span class="op">,</span> <span class="op">*</span>s<span class="op">,</span> color<span class="op">,</span> sizey<span class="op">);</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        x <span class="op">+=</span> sizey <span class="op">/</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        s<span class="op">++;</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>The function calls into <code>EPD_ShowChar</code> while performing a
+bounds check to make sure we don’t write past the screen dimensions.
+Here’s <code>EPD_ShowChar</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> EPD_ShowChar<span class="op">(</span><span class="dt">uint16_t</span> x<span class="op">,</span> <span class="dt">uint16_t</span> y<span class="op">,</span> <span class="dt">uint8_t</span> num<span class="op">,</span> <span class="dt">uint8_t</span> color<span class="op">,</span> <span class="dt">uint8_t</span> sizey<span class="op">)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint8_t</span> temp<span class="op">,</span> sizex<span class="op">,</span> t<span class="op">;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint16_t</span> i<span class="op">,</span> TypefaceNum<span class="op">;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint16_t</span> x0 <span class="op">=</span> x<span class="op">;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    sizex <span class="op">=</span> sizey <span class="op">/</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    TypefaceNum <span class="op">=</span> <span class="op">(</span>sizex <span class="op">/</span> <span class="dv">8</span> <span class="op">+</span> <span class="op">((</span>sizex <span class="op">%</span> <span class="dv">8</span><span class="op">)</span> <span class="op">?</span> <span class="dv">1</span> <span class="op">:</span> <span class="dv">0</span><span class="op">))</span> <span class="op">*</span> sizey<span class="op">;</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    num <span class="op">=</span> num <span class="op">-</span> <span class="ch">&#39; &#39;</span><span class="op">;</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span>i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> TypefaceNum<span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>sizey <span class="op">==</span> <span class="dv">12</span><span class="op">)</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>            temp <span class="op">=</span> ascii_1206<span class="op">[</span>num<span class="op">][</span>i<span class="op">];</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>sizey <span class="op">==</span> <span class="dv">16</span><span class="op">)</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>            temp <span class="op">=</span> ascii_1608<span class="op">[</span>num<span class="op">][</span>i<span class="op">];</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>sizey <span class="op">==</span> <span class="dv">24</span><span class="op">)</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>            temp <span class="op">=</span> ascii_2412<span class="op">[</span>num<span class="op">][</span>i<span class="op">];</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>sizey <span class="op">==</span> <span class="dv">32</span><span class="op">)</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>            temp <span class="op">=</span> ascii_3216<span class="op">[</span>num<span class="op">][</span>i<span class="op">];</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>sizey <span class="op">==</span> <span class="dv">48</span><span class="op">)</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>            temp <span class="op">=</span> ascii_4824<span class="op">[</span>num<span class="op">][</span>i<span class="op">];</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span>t <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> t <span class="op">&lt;</span> <span class="dv">8</span><span class="op">;</span> t<span class="op">++)</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(</span>temp <span class="op">&amp;</span> <span class="op">(</span><span class="bn">0x01</span> <span class="op">&lt;&lt;</span> t<span class="op">))</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>                EPD_DrawPoint<span class="op">(</span>x<span class="op">,</span> y<span class="op">,</span> color<span class="op">);</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>                EPD_DrawPoint<span class="op">(</span>x<span class="op">,</span> y<span class="op">,</span> <span class="op">!</span>color<span class="op">);</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>            x<span class="op">++;</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">((</span>x <span class="op">-</span> x0<span class="op">)</span> <span class="op">==</span> sizex<span class="op">)</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>                x <span class="op">=</span> x0<span class="op">;</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>                y<span class="op">++;</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>                <span class="cf">break</span><span class="op">;</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Now you can see why setting the string size to 100 doesn’t work in
+<code>EPD_ShowString</code>. The function only works with font sizes 12,
+16, 24, 32, and 48. You can also see that there is some
+<code>int8</code> array called <code>temp</code> which is being used to
+draw the points for each character onto the display. The
+<code>ascii_size</code> arrays are defined in <code>EPDfont.h</code> and
+look like this, which explains what is going on:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">const</span> <span class="dt">unsigned</span> <span class="dt">char</span> ascii_1206<span class="op">[][</span><span class="dv">12</span><span class="op">]={</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">},</span><span class="co">/*&quot; &quot;,0*/</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="op">{</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x04</span><span class="op">,</span><span class="bn">0x04</span><span class="op">,</span><span class="bn">0x04</span><span class="op">,</span><span class="bn">0x04</span><span class="op">,</span><span class="bn">0x04</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x04</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">},</span><span class="co">/*&quot;!&quot;,1*/</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="op">{</span><span class="bn">0x14</span><span class="op">,</span><span class="bn">0x14</span><span class="op">,</span><span class="bn">0x0A</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">},</span><span class="co">/*&quot;&quot;&quot;,2*/</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="op">{</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x0A</span><span class="op">,</span><span class="bn">0x0A</span><span class="op">,</span><span class="bn">0x1F</span><span class="op">,</span><span class="bn">0x0A</span><span class="op">,</span><span class="bn">0x0A</span><span class="op">,</span><span class="bn">0x1F</span><span class="op">,</span><span class="bn">0x0A</span><span class="op">,</span><span class="bn">0x0A</span><span class="op">,</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x00</span><span class="op">},</span><span class="co">/*&quot;#&quot;,3*/</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="op">{</span><span class="bn">0x00</span><span class="op">,</span><span class="bn">0x04</span><span class="op">,</span><span class="bn">0x0E</span><span class="op">,</span><span class="bn">0x15</span><span class="op">,</span><span class="bn">0x05</span><span class="op">,</span><span class="bn">0x06</span><span class="op">,</span><span class="bn">0x0C</span><span class="op">,</span><span class="bn">0x14</span><span class="op">,</span><span class="bn">0x15</span><span class="op">,</span><span class="bn">0x0E</span><span class="op">,</span><span class="bn">0x04</span><span class="op">,</span><span class="bn">0x00</span><span class="op">},</span><span class="co">/*&quot;$&quot;,4*/</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">//...</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
+<p>Each font size is an array of bitmaps representing a character. The
+larger the font size, the larger the bitmap. All 96 printable ASCII
+characters are represented. Each element in the array represents a point
+on the y-axis, and each bit in each byte represents a point on the
+x-axis. In fact, the entire display itself is represented as a
+bitmap:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">uint8_t</span> ImageBW<span class="op">[</span>ALLSCREEN_BYTES<span class="op">];</span></span></code></pre></div>
+<p>and <code>EPD_DrawPoint</code> sets the specified point in the
+display bitmap.</p>
+<p>So, to increase the font size, I would need to create a new bitmap
+font array. I looked online for tools to do this, and while I did find
+some that seem like they would work, they all seemed to have different
+representations. For example, the LVGL font converter - <a
+href="https://lvgl.io/tools/fontconverter"
+class="uri">https://lvgl.io/tools/fontconverter</a> - stored everything
+in a single bitmap rather than an array of bitmaps. I would also need to
+find a font that looks good on this display.</p>
+<p>Instead, I opted for the simplest solution, which is to upscale the
+largest font by 2x:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> EPD_ShowCharScaled<span class="op">(</span><span class="dt">uint16_t</span> x<span class="op">,</span> <span class="dt">uint16_t</span> y<span class="op">,</span> <span class="dt">uint8_t</span> num<span class="op">,</span> <span class="dt">uint8_t</span> color<span class="op">,</span> <span class="dt">uint8_t</span> sizey<span class="op">)</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint8_t</span> temp<span class="op">,</span> sizex<span class="op">,</span> t<span class="op">;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint16_t</span> i<span class="op">,</span> TypefaceNum<span class="op">;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint16_t</span> x0 <span class="op">=</span> x<span class="op">;</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    sizex <span class="op">=</span> sizey <span class="op">/</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    TypefaceNum <span class="op">=</span> <span class="op">(</span>sizex <span class="op">/</span> <span class="dv">8</span> <span class="op">+</span> <span class="op">((</span>sizex <span class="op">%</span> <span class="dv">8</span><span class="op">)</span> <span class="op">?</span> <span class="dv">1</span> <span class="op">:</span> <span class="dv">0</span><span class="op">))</span> <span class="op">*</span> sizey<span class="op">;</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    num <span class="op">=</span> num <span class="op">-</span> <span class="ch">&#39; &#39;</span><span class="op">;</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span>i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> TypefaceNum<span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>sizey <span class="op">==</span> <span class="dv">12</span><span class="op">)</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>            temp <span class="op">=</span> ascii_1206<span class="op">[</span>num<span class="op">][</span>i<span class="op">];</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>sizey <span class="op">==</span> <span class="dv">16</span><span class="op">)</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>            temp <span class="op">=</span> ascii_1608<span class="op">[</span>num<span class="op">][</span>i<span class="op">];</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>sizey <span class="op">==</span> <span class="dv">24</span><span class="op">)</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>            temp <span class="op">=</span> ascii_2412<span class="op">[</span>num<span class="op">][</span>i<span class="op">];</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>sizey <span class="op">==</span> <span class="dv">32</span><span class="op">)</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>            temp <span class="op">=</span> ascii_3216<span class="op">[</span>num<span class="op">][</span>i<span class="op">];</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>sizey <span class="op">==</span> <span class="dv">48</span><span class="op">)</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>            temp <span class="op">=</span> ascii_4824<span class="op">[</span>num<span class="op">][</span>i<span class="op">];</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span>t <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> t <span class="op">&lt;</span> <span class="dv">8</span><span class="op">;</span> t<span class="op">++)</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(</span>temp <span class="op">&amp;</span> <span class="op">(</span><span class="bn">0x01</span> <span class="op">&lt;&lt;</span> t<span class="op">))</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>                EPD_DrawPoint<span class="op">(</span>x<span class="op">,</span> y<span class="op">,</span> color<span class="op">);</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>                EPD_DrawPoint<span class="op">(</span>x <span class="op">+</span> <span class="dv">1</span><span class="op">,</span> y<span class="op">,</span> color<span class="op">);</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>                EPD_DrawPoint<span class="op">(</span>x<span class="op">,</span> y <span class="op">+</span> <span class="dv">1</span><span class="op">,</span> color<span class="op">);</span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>                EPD_DrawPoint<span class="op">(</span>x <span class="op">+</span> <span class="dv">1</span><span class="op">,</span> y <span class="op">+</span> <span class="dv">1</span><span class="op">,</span> color<span class="op">);</span></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>                EPD_DrawPoint<span class="op">(</span>x<span class="op">,</span> y<span class="op">,</span> <span class="op">!</span>color<span class="op">);</span></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>                EPD_DrawPoint<span class="op">(</span>x <span class="op">+</span> <span class="dv">1</span><span class="op">,</span> y<span class="op">,</span> <span class="op">!</span>color<span class="op">);</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>                EPD_DrawPoint<span class="op">(</span>x<span class="op">,</span> y <span class="op">+</span> <span class="dv">1</span><span class="op">,</span> <span class="op">!</span>color<span class="op">);</span></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>                EPD_DrawPoint<span class="op">(</span>x <span class="op">+</span> <span class="dv">1</span><span class="op">,</span> y <span class="op">+</span> <span class="dv">1</span><span class="op">,</span> <span class="op">!</span>color<span class="op">);</span></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>            x <span class="op">+=</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">((</span>x <span class="op">-</span> x0<span class="op">)</span> <span class="op">/</span> <span class="dv">2</span> <span class="op">==</span> sizex<span class="op">)</span></span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>                x <span class="op">=</span> x0<span class="op">;</span></span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>                y <span class="op">+=</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>                <span class="cf">break</span><span class="op">;</span></span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>All we have to do is draw a 2x2 box instead of a 1x1 point. We also
+need to draw new points starting from every x+2 and y+2 instead of x+1
+and y+1. This gives us 64 and 96 point font sizes. Theoretically, you
+could scale to any size using a for loop instead of calling
+<code>EPD_DrawPoint</code> directly, but 96pt is already close to the
+size of the screen.</p>
+<p>We also need to create an <code>EPD_ShowStringScaled</code> function
+that calls into <code>EPD_ShowCharScaled</code>:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> EPD_ShowStringScaled<span class="op">(</span><span class="dt">uint16_t</span> x<span class="op">,</span> <span class="dt">uint16_t</span> y<span class="op">,</span> <span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span>s<span class="op">,</span> <span class="dt">uint8_t</span> color<span class="op">,</span> <span class="dt">uint16_t</span> sizey<span class="op">)</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint16_t</span> scaled_sizex <span class="op">=</span> sizey<span class="op">;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="op">((*</span>s <span class="op">&lt;=</span> <span class="ch">&#39;~&#39;</span><span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="op">(*</span>s <span class="op">&gt;=</span> <span class="ch">&#39; &#39;</span><span class="op">))</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span>x <span class="op">&gt;</span> <span class="op">(</span>EPD_W <span class="op">-</span> <span class="dv">1</span><span class="op">)</span> <span class="op">||</span> y <span class="op">&gt;</span> <span class="op">(</span>EPD_H <span class="op">-</span> <span class="dv">1</span><span class="op">))</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>        EPD_ShowCharScaled<span class="op">(</span>x<span class="op">,</span> y<span class="op">,</span> <span class="op">*</span>s<span class="op">,</span> color<span class="op">,</span> sizey<span class="op">);</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>        x <span class="op">+=</span> scaled_sizex<span class="op">;</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>        s<span class="op">++;</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>After adding the headers to <code>EPD.h</code>, we can use it to
+display the time:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>EPD_ShowStringScaled<span class="op">(</span><span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> buff<span class="op">,</span> BLACK<span class="op">,</span> <span class="dv">48</span><span class="op">);</span></span></code></pre></div>
+<p>If you look closely, you can see that it’s upscaled. But if you look
+at it from a normal distance, it looks exactly like a regular font.
+Besides, the web used to use raster fonts, and nobody seemed bothered by
+that.</p>
+<figure>
+<img src="clock final.jpg" alt="the clock in its final form">
+<figcaption>
+I had this phone stand already and it works well enough.
+</figcaption>
+</figure>
+<p>That’s all for this review. The entire project took half a day to
+complete, and 90% of the time was spent on the two issues above. I can’t
+say much about the durability of the device because I just bought it,
+but I’ll update this post if I run into any serious issues. In terms of
+using this device as a clock or dashboard, I can say that it works well
+and recommend it to anyone wanting to get into e-paper displays, as long
+as you are aware it won’t work in the dark.</p>
+</body>
+</html>
