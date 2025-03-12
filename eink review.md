@@ -54,7 +54,7 @@ Once the display is recognized, you can use the "refresh_time" example project t
 
  <figure>
    <img src="clock with weather.jpg" alt="clock with weather data from OpenWeatherMap">
-   <figcaption>I don't a clock to tell me what year it is...</figcaption>
+   <figcaption>I don't need a clock to tell me what year it is...</figcaption>
  </figure>
 
 The time is set by connecting to an NTP server. This is where the ESP32's WiFi module comes into play. Of course, you need to give the device your SSID and password. The CrowPanel does come with a rotary switch which you could theoretically use to set the time manually.  If you use the sample code, beware of a slight issue with the time update logic. Here's how that looks:
